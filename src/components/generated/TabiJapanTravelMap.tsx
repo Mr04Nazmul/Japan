@@ -279,6 +279,8 @@ export const TabiJapanTravelMap = () => {
   const svg = useRef<SVGSVGElement>(null);
  const mapShell=useRef<HTMLDivElement>(null);
   const [poster, setPoster] = useState<string | null>(null);
+  const [vectorPoster, setVectorPoster] = useState<string | null>(null);
+  useEffect(() => () => { if (vectorPoster) URL.revokeObjectURL(vectorPoster); }, [vectorPoster]);
   const [exporting, setExporting] = useState(false);
   useEffect(() => () => {
     if (poster) URL.revokeObjectURL(poster);
@@ -322,6 +324,8 @@ export const TabiJapanTravelMap = () => {
       context.drawImage(picture, 0, 0, canvas.width, canvas.height);
       const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('PNG generation failed')), 'image/png'));
       setPoster(URL.createObjectURL(blob));
+      setVectorPoster(source);
+      source = "";
     } catch {
       setToast('Could not create the poster. Please try again.');
     } finally {
@@ -338,6 +342,14 @@ export const TabiJapanTravelMap = () => {
     a.click();
     a.remove();
     setToast('PNG picture downloaded. To save to Photos, use Save to Gallery → Save Image.');
+  };
+  const saveVector = () => {
+    if (!vectorPoster) return;
+    const a = document.createElement("a");
+    a.href = vectorPoster;
+    a.download = (owner.trim() || "My") + "-Japan-Travel-Map.svg";
+    document.body.appendChild(a); a.click(); a.remove();
+    setToast("Vector SVG downloaded — stays sharp at any zoom.");
   };
   const sharePoster = async () => {
     if (!poster) return;
@@ -381,5 +393,5 @@ export const TabiJapanTravelMap = () => {
               top: 180,
               behavior: 'smooth'
             });
-          }}>{visited.includes(f.id) ? '✓' : '○'} {f.name}</button>)}{!filtered.length && <p>No prefectures found. Try another name.</p>}</div></section><footer><span className="brand">旅 myjapan</span><p>Collect moments, not just destinations. <a href="./privacy.html">Privacy</a></p><span>MADE FOR THE WANDERER IN YOU ↗</span></footer></main>{exporting && <div className="toast" role="status">Creating your HD poster…</div>}{poster && <div className="posterbackdrop" role="dialog" aria-modal="true" aria-label="Download poster preview" onClick={() => setPoster(null)}><section className="postermodal" onClick={e => e.stopPropagation()}><header><div><strong>Your myjapan poster</strong><p>PNG · 3000 × 3750 · ready to save</p></div><button autoFocus aria-label="Close preview" onClick={() => setPoster(null)}>×</button></header><p className="galleryhint">iPhone: tap Save to Gallery, then choose Save Image. If unavailable, open in Safari or hold the image to save.</p><div className="posterimage"><img src={poster} alt="Your personalized Japan travel map with full place names, visited prefectures, name and exploration progress" /></div><div className="posteractions"><button onClick={sharePoster}>▧ Save to Gallery</button><button onClick={savePoster}>↓ Download PNG</button></div></section></div>}{toast && <div className="toast" role="status">✓ {toast}</div>}</div>;
+          }}>{visited.includes(f.id) ? '✓' : '○'} {f.name}</button>)}{!filtered.length && <p>No prefectures found. Try another name.</p>}</div></section><footer><span className="brand">旅 myjapan</span><p>Collect moments, not just destinations. <a href="./privacy.html">Privacy</a></p><span>MADE FOR THE WANDERER IN YOU ↗</span></footer></main>{exporting && <div className="toast" role="status">Creating your HD poster…</div>}{poster && <div className="posterbackdrop" role="dialog" aria-modal="true" aria-label="Download poster preview" onClick={() => setPoster(null)}><section className="postermodal" onClick={e => e.stopPropagation()}><header><div><strong>Your myjapan poster</strong><p>PNG · 3000 × 3750 + sharp vector SVG</p></div><button autoFocus aria-label="Close preview" onClick={() => setPoster(null)}>×</button></header><p className="galleryhint">iPhone: tap Save to Gallery, then choose Save Image. If unavailable, open in Safari or hold the image to save.</p><div className="posterimage"><img src={vectorPoster || poster} alt="Your personalized Japan travel map with full place names, visited prefectures, name and exploration progress" /></div><div className="posteractions"><button onClick={sharePoster}>▧ Save to Gallery</button><button onClick={savePoster}>↓ Download PNG</button><button onClick={saveVector}>◇ Download SVG<span>Sharp at any zoom</span></button></div></section></div>}{toast && <div className="toast" role="status">✓ {toast}</div>}</div>;
 };
