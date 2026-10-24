@@ -31,7 +31,7 @@ jobs:
       - name: Prepare published files
         run: |
           mkdir public-site
-          cp index.html privacy.html ads.txt CNAME .nojekyll public-site/
+          cp index.html about.html privacy.html content.css robots.txt sitemap.xml ads.txt CNAME .nojekyll public-site/
           cp -R assets public-site/
       - uses: actions/upload-pages-artifact@v3
         with:
